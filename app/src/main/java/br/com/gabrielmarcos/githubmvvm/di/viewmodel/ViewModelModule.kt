@@ -10,6 +10,7 @@ import dagger.multibindings.IntoMap
 
 @Module
 abstract class ViewModelModule {
+
     @Binds
     @IntoMap
     @ViewModelKey(GistViewModel::class)

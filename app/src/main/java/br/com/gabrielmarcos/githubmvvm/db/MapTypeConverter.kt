@@ -1,4 +1,4 @@
-package br.com.gabrielmarcos.githubmvvm.base.db
+package br.com.gabrielmarcos.githubmvvm.db
 
 import androidx.room.TypeConverter
 import br.com.gabrielmarcos.githubmvvm.model.GistFile

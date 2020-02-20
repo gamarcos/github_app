@@ -1,16 +1,15 @@
 package br.com.gabrielmarcos.githubmvvm.di.core
 
 import android.app.Application
-import br.com.gabrielmarcos.githubapi.di.qualifiers.CoroutineScropeIO
-import br.com.gabrielmarcos.githubapi.di.qualifiers.GitAPI
+import br.com.gabrielmarcos.githubmvvm.di.qualifiers.CoroutineScropeIO
+import br.com.gabrielmarcos.githubmvvm.di.qualifiers.GitAPI
 import br.com.gabrielmarcos.githubmvvm.BuildConfig
-import br.com.gabrielmarcos.githubmvvm.base.db.AppDatabase
+import br.com.gabrielmarcos.githubmvvm.db.AppDatabase
 import br.com.gabrielmarcos.githubmvvm.di.viewmodel.ViewModelModule
 import br.com.gabrielmarcos.githubmvvm.plugin.FavoritesDAO
 import br.com.gabrielmarcos.githubmvvm.plugin.GistDAO
 import br.com.gabrielmarcos.githubmvvm.plugin.GistRepositoryImpl
 import br.com.gabrielmarcos.githubmvvm.plugin.GitService
-import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineScope

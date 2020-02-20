@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import br.com.gabrielmarcos.githubapi.data.EventObserver
+import br.com.gabrielmarcos.githubmvvm.data.EventObserver
 import br.com.gabrielmarcos.githubmvvm.R
 import br.com.gabrielmarcos.githubmvvm.base.view.BaseFragment
 import br.com.gabrielmarcos.githubmvvm.extensions.hide
@@ -14,6 +14,7 @@ import br.com.gabrielmarcos.githubmvvm.extensions.injectViewModel
 import br.com.gabrielmarcos.githubmvvm.extensions.show
 import br.com.gabrielmarcos.githubmvvm.model.Gist
 import br.com.gabrielmarcos.githubmvvm.util.InfiniteScrollListener
+import br.com.gabrielmarcos.githubmvvm.util.InternetUtil
 import br.com.gabrielmarcos.githubmvvm.util.NavigationCustom
 import kotlinx.android.synthetic.main.gist_fragment.*
 
@@ -41,7 +42,8 @@ class GistFragment : BaseFragment() {
 
     private fun setUpViewModel() {
         viewModel = injectViewModel(viewModelFactory)
-        viewModel.getGistList()
+        viewModel.getLocalFavoriteList(InternetUtil.isInternetOn())
+        viewModel.connectionAvailability = InternetUtil.isInternetOn()
     }
 
     private fun setUpObservables() {
@@ -53,7 +55,15 @@ class GistFragment : BaseFragment() {
             gistProgressBar.show()
         })
 
-        viewModel.hiddeLoading.observe(viewLifecycleOwner, EventObserver {
+        viewModel.resultError.observe(viewLifecycleOwner, EventObserver {
+            gistGroupError.show()
+            gistProgressBar.hide()
+            gistRecyclerView.hide()
+        })
+
+        viewModel.resultSuccess.observe(viewLifecycleOwner, EventObserver {
+            gistRecyclerView.show()
+            gistGroupError.hide()
             gistProgressBar.hide()
         })
     }

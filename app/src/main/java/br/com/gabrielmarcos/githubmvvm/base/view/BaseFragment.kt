@@ -5,8 +5,8 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
-import br.com.gabrielmarcos.githubapi.data.Event
-import br.com.gabrielmarcos.githubapi.data.EventObserver
+import br.com.gabrielmarcos.githubmvvm.data.Event
+import br.com.gabrielmarcos.githubmvvm.data.EventObserver
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject

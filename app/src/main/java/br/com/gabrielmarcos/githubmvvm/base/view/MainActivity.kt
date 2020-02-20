@@ -1,20 +1,30 @@
 package br.com.gabrielmarcos.githubmvvm.base.view
 
+import android.app.SearchManager
+import android.content.Context
 import android.os.Bundle
+import android.view.Menu
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import br.com.gabrielmarcos.githubmvvm.R
+import br.com.gabrielmarcos.githubmvvm.extensions.injectViewModel
+import br.com.gabrielmarcos.githubmvvm.gist.GistViewModel
 import br.com.gabrielmarcos.githubmvvm.util.InternetUtil
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.main_activity.*
 
 class MainActivity : BaseActivity() {
+
+    private lateinit var gistViewModel: GistViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
         checkNetworkConnection()
         setUpToolbar()
+        setUpViewModel()
     }
 
     private fun setUpToolbar() {
@@ -23,6 +33,28 @@ class MainActivity : BaseActivity() {
         supportActionBar?.setDisplayShowHomeEnabled(true)
         toolbar.navigationIcon = resources.getDrawable(R.drawable.ic_arrow_left_outline_white_24dp)
         toolbar.setNavigationOnClickListener { onBackPressed() }
+    }
+
+    private fun setUpViewModel() {
+        gistViewModel = injectViewModel(viewModelFactory)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.search_menu, menu)
+        val manager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        val searchItem = menu?.findItem(R.id.search)
+        val searchView = searchItem?.actionView as SearchView
+        searchView.setSearchableInfo(manager.getSearchableInfo(componentName))
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean = false
+            override fun onQueryTextChange(newText: String?): Boolean {
+                gistViewModel.filterGistOwner(newText)
+                return true
+            }
+        })
+
+        return true
     }
 
     private fun checkNetworkConnection() {

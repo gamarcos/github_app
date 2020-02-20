@@ -1,6 +1,6 @@
 
 
-package br.com.gabrielmarcos.githubapi.util
+package br.com.gabrielmarcos.githubmvvm.util
 
 /**
  * Constants used throughout the app.

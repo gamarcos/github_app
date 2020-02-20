@@ -6,8 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
-import br.com.gabrielmarcos.githubapi.data.Event
-import br.com.gabrielmarcos.githubapi.data.EventObserver
+import br.com.gabrielmarcos.githubmvvm.data.Event
+import br.com.gabrielmarcos.githubmvvm.data.EventObserver
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
@@ -26,4 +26,7 @@ abstract class BaseActivity: AppCompatActivity(), HasSupportFragmentInjector {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
     }
+
+    @Inject
+    internal lateinit var viewModelFactory: ViewModelProvider.Factory
 }

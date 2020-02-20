@@ -1,4 +1,4 @@
-package br.com.gabrielmarcos.githubapi.data
+package br.com.gabrielmarcos.githubmvvm.data
 
 import androidx.lifecycle.Observer
 

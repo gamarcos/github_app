@@ -1,4 +1,4 @@
-package br.com.gabrielmarcos.githubapi.di.qualifiers
+package br.com.gabrielmarcos.githubmvvm.di.qualifiers
 
 import javax.inject.Qualifier
 

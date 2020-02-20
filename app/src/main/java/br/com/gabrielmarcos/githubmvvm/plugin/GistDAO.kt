@@ -24,5 +24,4 @@ interface GistDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(gist: Gist)
-
 }

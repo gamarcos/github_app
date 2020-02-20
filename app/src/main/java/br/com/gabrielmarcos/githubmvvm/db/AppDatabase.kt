@@ -1,4 +1,4 @@
-package br.com.gabrielmarcos.githubmvvm.base.db
+package br.com.gabrielmarcos.githubmvvm.db
 
 import android.content.Context
 import androidx.room.Database

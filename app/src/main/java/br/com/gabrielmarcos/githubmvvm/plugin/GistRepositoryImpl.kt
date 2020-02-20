@@ -14,8 +14,9 @@ class GistRepositoryImpl @Inject constructor(
 ) : GistRepository {
 
     override fun getGistList(page: Int, connectionAvailability: Boolean): Single<List<Gist>> {
-        return takeIf { connectionAvailability }?.run { gistService.getGists(page) }
-            ?: gistDAO.getAllGists()
+        return takeIf { connectionAvailability }?.run {
+            gistService.getGists(page)
+        } ?: gistDAO.getAllGists()
     }
 
     override fun saveLocalGist(gist: List<Gist>): Completable = gistDAO.insertAll(gist)
