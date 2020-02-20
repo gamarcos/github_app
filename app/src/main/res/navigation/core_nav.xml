@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/core_nav"
+    app:startDestination="@id/gistFragment">
+
+    <fragment
+        android:id="@+id/gistFragment"
+        android:name="br.com.gabrielmarcos.githubmvvm.gist.GistFragment"
+        android:label="GistFragment">
+
+        <action
+            android:id="@+id/action_gist_to_gist_detail"
+            app:destination="@+id/gistDetailFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/gistDetailFragment"
+        android:name="br.com.gabrielmarcos.githubmvvm.gist.GistDetailFragment"
+        android:label="GistDetailFragment">
+
+
+        <argument
+            android:name="gits_id"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+
+    </fragment>
+
+</navigation>

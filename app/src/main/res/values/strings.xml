@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">GithubMVVM</string>
+    
+    <item name="error_connection_unavailable" type="string">Connection not available</item>
+    <item name="error_connection_available" type="string">Connection available</item>
+
+    <item name="gist_file_title" type="string">File Types : </item>
+    <item name="gist_field_name_title" type="string">Name : </item>
+</resources>

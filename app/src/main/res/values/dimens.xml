@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Per Material Design specs: -->
+    <!-- https://material.io/design/components/buttons-floating-action-button.html#specs -->
+    <dimen name="fab_margin">16dp</dimen>
+
+    <!-- Padding on the bottom of a screen so that the FAB won't overlap scrolled text. -->
+    <dimen name="fab_bottom_padding">72dp</dimen>
+
+    <dimen name="app_bar_height">400dp</dimen>
+
+    <dimen name="margin_normal">16dp</dimen>
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_grid">2.5dp</dimen>
+
+    <dimen name="navigation_drawer_header_height">192dp</dimen>
+    <dimen name="navigation_drawer_header_padding">16dp</dimen>
+    <dimen name="navigation_drawer_image_width">100dp</dimen>
+
+    <dimen name="corner_card">8dp</dimen>
+
+    <dimen name="avatar_size">100dp</dimen>
+    <dimen name="star_icon_size">30dp</dimen>
+
+    <dimen name="divider_smallest">1dp</dimen>
+    <dimen name="divider_small">2dp</dimen>
+    <dimen name="divider_medium">4dp</dimen>
+    <dimen name="divider_large">8dp</dimen>
+
+    <dimen name="padding_smaller">4dp</dimen>
+    <dimen name="padding_small">8dp</dimen>
+    <dimen name="padding_small_2">12dp</dimen>
+    <dimen name="padding_small_3">14dp</dimen>
+    <dimen name="padding_default">16dp</dimen>
+    <dimen name="padding_large">24dp</dimen>
+    <dimen name="padding_large_2">48dp</dimen>
+</resources>

@@ -1,0 +1,11 @@
+package br.com.gabrielmarcos.githubapi.di.qualifiers
+
+import javax.inject.Qualifier
+
+@Retention(AnnotationRetention.BINARY)
+@Qualifier
+annotation class GitAPI
+
+@Retention(AnnotationRetention.BINARY)
+@Qualifier
+annotation class CoroutineScropeIO
