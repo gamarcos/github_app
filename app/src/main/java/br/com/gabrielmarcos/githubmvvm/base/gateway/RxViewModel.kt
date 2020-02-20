@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import br.com.gabrielmarcos.githubmvvm.base.rx.SchedulersFacade
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -29,6 +30,22 @@ open class RxViewModel : ViewModel() {
         )
     }
 
+    fun <P> disposableRxThread(
+        single: Single<P>,
+        subscribe: (disposable: Disposable) -> Unit,
+        subscribeSuccess: (result: P) -> Unit,
+        subscribeError: (t: Throwable) -> Unit
+    ) {
+        addToDisposable(
+            single
+                .subscribeOn(SchedulersFacade.io())
+                .observeOn(SchedulersFacade.ui())
+                .doOnSubscribe { subscribe(it) }
+                .doOnError { subscribeError(it) }
+                .subscribe({ subscribeSuccess(it) }, { subscribeError(it) })
+        )
+    }
+
     @SuppressLint("CheckResult")
     fun <P> disposableRxThread(
         single: () -> P,
@@ -38,10 +55,13 @@ open class RxViewModel : ViewModel() {
     ) {
         Observable.fromCallable { single() }
             .subscribeOn(SchedulersFacade.io())
-            .observeOn(AndroidSchedulers.mainThread())
+            .observeOn(SchedulersFacade.ui())
             .doOnSubscribe { subscribe(it) }
             .doOnError { subscribeError(it) }
-            .subscribe({ subscribeSuccess(it) }, { subscribeError(it) })
+            .subscribe(
+                { subscribeSuccess(it) },
+                { subscribeError(it) }
+            )
     }
 
     override fun onCleared() {
