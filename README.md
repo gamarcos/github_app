@@ -35,3 +35,10 @@ The following strategies were used for local storage, data connection, asynchron
  - Retrofit
  - Dagger2
  - Room
+ 
+### API
+https://developer.github.com/v3/
+
+### Tests
+ - In Progress
+
