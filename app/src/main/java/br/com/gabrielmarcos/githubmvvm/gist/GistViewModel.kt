@@ -1,6 +1,5 @@
 package br.com.gabrielmarcos.githubmvvm.gist
 
-import android.hardware.camera2.CameraManager
 import androidx.lifecycle.MutableLiveData
 import br.com.gabrielmarcos.githubmvvm.base.gateway.RxViewModel
 import br.com.gabrielmarcos.githubmvvm.data.Event
@@ -25,9 +24,9 @@ class GistViewModel @Inject constructor(
 
     fun getLocalFavoriteList() {
         disposableRxThread(
-            gistRepository.getSavedFavoriteGist(),
+            { gistRepository.getSavedFavoriteGist() },
             { showLoading.value = Event(Unit) },
-            { getOnlyFavId(it) },
+            { it.map { mapped -> getOnlyFavId(mapped) } },
             { handleError(it) })
         getGistList()
     }
@@ -40,16 +39,17 @@ class GistViewModel @Inject constructor(
 
     fun getGistList() {
         disposableRxThread(
-            gistRepository.getGistList(currentPage, connectionAvailability),
+            { gistRepository.getGistList(currentPage, connectionAvailability) },
             { showLoading.value = Event(Unit) },
-            { gistListSuccess(it) },
+            { it.map { mapped -> gistListSuccess(mapped) } },
             { handleError(it) })
     }
 
     fun getGist(id: String) {
         disposableRxThread(
-            gistRepository.getGist(id, InternetUtil.isInternetOn()), { },
-            { gistSuccess(it) },
+            { gistRepository.getGist(id, InternetUtil.isInternetOn()) },
+            { },
+            { it.map { mapped -> gistSuccess(mapped) } },
             { handleError(it) })
     }
 

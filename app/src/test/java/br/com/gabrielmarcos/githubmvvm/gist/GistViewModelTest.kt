@@ -3,9 +3,7 @@ package br.com.gabrielmarcos.githubmvvm.gist
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import br.com.gabrielmarcos.githubmvvm.core.TrampolineSchedulerRule
 import br.com.gabrielmarcos.githubmvvm.model.FavModel
-import br.com.gabrielmarcos.githubmvvm.util.InternetUtil
 import br.com.gabrielmarcos.githubmvvm.utils.getOrAwaitValue
-import io.reactivex.Observable
 import io.reactivex.Single
 import org.junit.Assert
 import org.junit.Before
@@ -16,10 +14,12 @@ import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
-import java.lang.RuntimeException
 
 @RunWith(MockitoJUnitRunner::class)
 class GistViewModelTest {
+
+    @get:Rule
+    val trampolineSchedulerRule = TrampolineSchedulerRule()
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -41,10 +41,9 @@ class GistViewModelTest {
 
     @Test
     fun `when get list of gist thows exception then asset showError is not null`() {
-        `when`(gistRepository.getGistList(0, true)).thenThrow(RuntimeException())
-        `when`(gistRepository.getSavedFavoriteGist()).thenReturn(favLocalResponse)
+        `when`(gistRepository.getSavedFavoriteGist()).thenThrow(RuntimeException())
         viewModel.connectionAvailability = true
-        viewModel.getGistList()
+        viewModel.getLocalFavoriteList()
 
         viewModel.showSnackbarMessage.getOrAwaitValue().run {
             Assert.assertNotNull(getContentIfNotHandled())

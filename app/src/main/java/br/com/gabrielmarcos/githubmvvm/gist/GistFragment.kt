@@ -42,7 +42,7 @@ class GistFragment : BaseFragment() {
 
     private fun setUpViewModel() {
         viewModel = injectViewModel(viewModelFactory)
-        viewModel.getLocalFavoriteList(InternetUtil.isInternetOn())
+        viewModel.getLocalFavoriteList()
         viewModel.connectionAvailability = InternetUtil.isInternetOn()
     }
 

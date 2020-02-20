@@ -1,5 +1,6 @@
 package br.com.gabrielmarcos.githubmvvm.core
 
+import br.com.gabrielmarcos.githubmvvm.base.rx.SchedulersFacade
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
@@ -12,6 +13,7 @@ class TrampolineSchedulerRule : TestRule {
         return object : Statement() {
             @Throws(Throwable::class)
             override fun evaluate() {
+                SchedulersFacade.ui(Schedulers.trampoline())
                 RxJavaPlugins.setIoSchedulerHandler { Schedulers.trampoline() }
                 RxJavaPlugins.setComputationSchedulerHandler { Schedulers.trampoline() }
                 RxJavaPlugins.setNewThreadSchedulerHandler { Schedulers.trampoline() }
