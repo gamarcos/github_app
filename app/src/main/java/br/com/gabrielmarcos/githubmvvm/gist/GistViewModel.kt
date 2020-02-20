@@ -53,7 +53,7 @@ class GistViewModel @Inject constructor(
 
     fun getGist(id: String) {
         addToDisposable(
-            gistRepository.getGist(id)
+            gistRepository.getGist(id, InternetUtil.isInternetOn())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe { showLoading.value = Event(Unit) }

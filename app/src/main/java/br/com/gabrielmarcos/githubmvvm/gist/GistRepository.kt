@@ -7,7 +7,7 @@ import io.reactivex.Single
 
 interface GistRepository {
     fun getGistList(page: Int, connectionAvailability: Boolean): Single<List<Gist>>
-    fun getGist(uuid: String): Single<Gist>
+    fun getGist(uuid: String, connectionAvailability: Boolean): Single<Gist>
     fun saveLocalGist(gist: List<Gist>): Completable
     fun setFavoriteGist(gist: Gist): Completable
     fun deletFavoriteGistById(id: String): Completable

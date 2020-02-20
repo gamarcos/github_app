@@ -14,7 +14,7 @@ interface GistDAO {
     fun getAllGists(): Single<List<Gist>>
 
     @Query("SELECT * FROM gist WHERE gistId = :id")
-    fun getGistById(id: String): Gist
+    fun getGistById(id: String): Single<Gist>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(gists: List<Gist>): Completable
