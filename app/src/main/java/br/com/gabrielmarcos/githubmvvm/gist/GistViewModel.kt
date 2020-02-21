@@ -1,5 +1,6 @@
 package br.com.gabrielmarcos.githubmvvm.gist
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.MutableLiveData
 import br.com.gabrielmarcos.githubmvvm.base.gateway.RxViewModel
 import br.com.gabrielmarcos.githubmvvm.data.Event
@@ -8,63 +9,77 @@ import br.com.gabrielmarcos.githubmvvm.model.Gist
 import br.com.gabrielmarcos.githubmvvm.util.InternetUtil
 import javax.inject.Inject
 
-class GistViewModel @Inject constructor(
+open class GistViewModel @Inject constructor(
     private val gistRepository: GistRepository
 ) : RxViewModel() {
 
     var currentPage = 0
     var connectionAvailability: Boolean = true
+
+    // Only For testes :(
+    internal var listResult: List<Gist> = emptyList()
+    internal var favIdList: List<String> = emptyList()
+
     internal val showSnackbarMessage: MutableLiveData<Event<String>> = MutableLiveData()
     internal val showLoading: MutableLiveData<Event<Unit>> = MutableLiveData()
     internal val gistListViewState: MutableLiveData<List<Gist>> = MutableLiveData()
     internal val gistDetailViewState: MutableLiveData<Gist> = MutableLiveData()
     internal val resultError: MutableLiveData<Event<Unit>> = MutableLiveData()
     internal val resultSuccess: MutableLiveData<Event<Unit>> = MutableLiveData()
-    internal var favoriteList: List<String> = emptyList()
+
+    fun getGistList() {
+        disposableRxThread(
+            gistRepository.getGistList(currentPage, connectionAvailability),
+            { handleGistListResult(it) },
+            { handleError(it) })
+    }
+
+    private fun handleGistListResult(gist: List<Gist>) {
+        getLocalFavoriteList()
+        listResult = gist
+    }
 
     fun getLocalFavoriteList() {
         disposableRxThread(
-            { gistRepository.getSavedFavoriteGist() },
-            { showLoading.value = Event(Unit) },
-            { it.map { mapped -> getOnlyFavId(mapped) } },
-            { handleError(it) })
-        getGistList()
+            gistRepository.getSavedFavoriteGist(),
+            { getOnlyFavId(it) },
+            { handleError(it) }
+        )
     }
 
     private fun getOnlyFavId(favList: List<FavModel>) {
         val favIds = ArrayList<String>()
         favList.forEach { favIds.add(it.favId) }
-        favoriteList = favIds
+        favIdList = favIds
+        buildGistMapper()
     }
 
-    fun getGistList() {
-        disposableRxThread(
-            { gistRepository.getGistList(currentPage, connectionAvailability) },
-            { showLoading.value = Event(Unit) },
-            { it.map { mapped -> gistListSuccess(mapped) } },
-            { handleError(it) })
+    private fun buildGistMapper() {
+        handleListUpdate().let {
+            gistListViewState.value = it
+            saveLocalResponse(it)
+        }
+        resultSuccess.value = Event(Unit)
+    }
+
+    private fun handleListUpdate(): List<Gist> {
+        return if (gistListViewState.value.isNullOrEmpty()) {
+            GistMapper.map(listResult, favIdList)
+        } else {
+            GistMapper.map(
+                gistListViewState.value!!
+                    .plus(listResult)
+                    .distinct(),
+                favIdList
+            )
+        }
     }
 
     fun getGist(id: String) {
         disposableRxThread(
-            { gistRepository.getGist(id, InternetUtil.isInternetOn()) },
-            { },
-            { it.map { mapped -> gistSuccess(mapped) } },
+            gistRepository.getGist(id, InternetUtil.isInternetOn()),
+            { gistSuccess(it) },
             { handleError(it) })
-    }
-
-    private fun gistListSuccess(gist: List<Gist>) {
-        gistListViewState.value = handleListUpdate(gist)
-        saveLocalResponse(gistListViewState.value?.let { it } ?: emptyList())
-        resultSuccess.value = Event(Unit)
-    }
-
-    private fun handleListUpdate(gist: List<Gist>): List<Gist> {
-        return takeIf { gistListViewState.value.isNullOrEmpty() }?.run {
-            GistMapper.map(gist, favoriteList)
-        } ?: GistMapper.map(gistListViewState.value?.run {
-            plus(gist).distinct()
-        } ?: gist, favoriteList)
     }
 
     private fun gistSuccess(gist: Gist) {
@@ -77,8 +92,9 @@ class GistViewModel @Inject constructor(
         resultError.value = Event(Unit)
     }
 
-    private fun saveLocalResponse(gist: List<Gist>) =
-        disposableRxThread(gistRepository.saveLocalGist(gist), { handleError(it) })
+    @VisibleForTesting
+    fun saveLocalResponse(gist: List<Gist>) =
+        disposableRxThread(gistRepository.saveLocalGist(gist))
 
     fun handleFavoriteState(gist: Gist) {
         takeIf { gist.starred }?.run {
@@ -87,10 +103,10 @@ class GistViewModel @Inject constructor(
     }
 
     private fun addGistFav(gist: Gist) =
-        disposableRxThread(gistRepository.setFavoriteGist(gist), { handleError(it) })
+        disposableRxThread(gistRepository.setFavoriteGist(gist))
 
     private fun deleteGistFav(gistId: String) =
-        disposableRxThread(gistRepository.deletFavoriteGistById(gistId), { handleError(it) })
+        disposableRxThread(gistRepository.deletFavoriteGistById(gistId))
 
     fun updateGistList() {
         currentPage++

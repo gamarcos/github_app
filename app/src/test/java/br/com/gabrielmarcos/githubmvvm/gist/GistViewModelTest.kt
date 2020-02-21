@@ -3,15 +3,21 @@ package br.com.gabrielmarcos.githubmvvm.gist
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import br.com.gabrielmarcos.githubmvvm.core.TrampolineSchedulerRule
 import br.com.gabrielmarcos.githubmvvm.model.FavModel
-import br.com.gabrielmarcos.githubmvvm.utils.getOrAwaitValue
+import br.com.gabrielmarcos.githubmvvm.model.Gist
 import io.reactivex.Single
+import io.reactivex.observers.TestObserver
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.*
 import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.Mockito.`when`
+import org.mockito.Mockito.anyList
+import org.mockito.Mockito.doNothing
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
@@ -27,30 +33,31 @@ class GistViewModelTest {
     @Mock
     private lateinit var gistRepository: GistRepository
 
-
-    private var favLocalResponse: Single<List<FavModel>>? = null
-
     private lateinit var viewModel: GistViewModel
 
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
         viewModel = GistViewModel(gistRepository)
-        favLocalResponse = Single.just(listOf(FavModel(0, "")))
     }
 
     @Test
-    fun `when get list of gist thows exception then asset showError is not null`() {
-        `when`(gistRepository.getSavedFavoriteGist()).thenThrow(RuntimeException())
+    fun `when get list of gist response success then return a list of favorite gist`() {
+        val viewModelSpy = Mockito.spy(viewModel)
+        val expectedResponse = Single.just(
+            listOf(
+                FavModel(0, ""),
+                FavModel(0, ""),
+                FavModel(0, "")
+            )
+        )
+
+        `when`(gistRepository.getSavedFavoriteGist()).thenReturn(expectedResponse)
+        doNothing().`when`(viewModelSpy).saveLocalResponse(emptyList())
+
         viewModel.connectionAvailability = true
         viewModel.getLocalFavoriteList()
 
-        viewModel.showSnackbarMessage.getOrAwaitValue().run {
-            Assert.assertNotNull(getContentIfNotHandled())
-        }
-
-        viewModel.resultError.getOrAwaitValue().run {
-            Assert.assertNotNull(getContentIfNotHandled())
-        }
+        Assert.assertTrue(viewModel.favIdList.size == 2)
     }
 }
