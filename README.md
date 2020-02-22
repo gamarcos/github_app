@@ -49,4 +49,5 @@ https://developer.github.com/v3/
  
  ### Improvements
   - Rx Android (Urgent)
+  - Infinity Scroll
 
