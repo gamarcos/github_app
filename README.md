@@ -3,9 +3,10 @@
 This is a project that uses observables in Room, with RxJava's Single`s objects. Based on Android architecture components
 
 ## Introduction
----
+
 
 ### Functionality
+
  - Shows a public gists
  - Save a list of lists locally
  - Favorite gists locally
@@ -40,5 +41,12 @@ The following strategies were used for local storage, data connection, asynchron
 https://developer.github.com/v3/
 
 ### Tests
+ - GistMapperTest
+ - GistRepositoryImplTest
+ - GistMapperTest
+ - GistViewModelTest
  - In Progress
+ 
+ ### Improvements
+  - Rx Android (Urgent)
 
