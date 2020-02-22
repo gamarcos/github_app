@@ -1,12 +1,10 @@
 package br.com.gabrielmarcos.githubmvvm.gist
 
-import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.MutableLiveData
 import br.com.gabrielmarcos.githubmvvm.base.gateway.RxViewModel
 import br.com.gabrielmarcos.githubmvvm.data.Event
 import br.com.gabrielmarcos.githubmvvm.model.FavModel
 import br.com.gabrielmarcos.githubmvvm.model.Gist
-import br.com.gabrielmarcos.githubmvvm.util.InternetUtil
 import javax.inject.Inject
 
 open class GistViewModel @Inject constructor(
@@ -16,7 +14,7 @@ open class GistViewModel @Inject constructor(
     var currentPage = 0
     var connectionAvailability: Boolean = true
 
-    // Only For testes :(
+    // Only For testes uuuh ugly :(
     internal var listResult: List<Gist> = emptyList()
     internal var favIdList: List<String> = emptyList()
 
@@ -77,7 +75,7 @@ open class GistViewModel @Inject constructor(
 
     fun getGist(id: String) {
         disposableRxThread(
-            gistRepository.getGist(id, InternetUtil.isInternetOn()),
+            gistRepository.getGist(id, connectionAvailability),
             { gistSuccess(it) },
             { handleError(it) })
     }
@@ -92,7 +90,6 @@ open class GistViewModel @Inject constructor(
         resultError.value = Event(Unit)
     }
 
-    @VisibleForTesting
     fun saveLocalResponse(gist: List<Gist>) =
         disposableRxThread(gistRepository.saveLocalGist(gist))
 
@@ -102,8 +99,7 @@ open class GistViewModel @Inject constructor(
         } ?: deleteGistFav(gist.gistId)
     }
 
-    private fun addGistFav(gist: Gist) =
-        disposableRxThread(gistRepository.setFavoriteGist(gist))
+    private fun addGistFav(gist: Gist) = disposableRxThread(gistRepository.setFavoriteGist(gist))
 
     private fun deleteGistFav(gistId: String) =
         disposableRxThread(gistRepository.deletFavoriteGistById(gistId))

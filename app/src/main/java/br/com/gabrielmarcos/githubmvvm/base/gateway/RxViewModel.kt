@@ -6,7 +6,6 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
 open class RxViewModel : ViewModel() {
@@ -37,6 +36,7 @@ open class RxViewModel : ViewModel() {
             single
                 .subscribeOn(SchedulersFacade.io())
                 .observeOn(SchedulersFacade.ui())
+                .doOnError { subscribeError(it) }
                 .subscribe(
                     { success -> subscribeSuccess(success) },
                     { error -> subscribeError(error) }
