@@ -14,12 +14,11 @@ val favExpectedResponse = Single.just(
     )
 )
 
-val gistExpectedResponse =
-    listOf(
-        Gist("12345", "", Date(), HashMap(), Owner("", "")),
-        Gist("123456", "", Date(), HashMap(), Owner("", "")),
-        Gist("1234567", "", Date(), HashMap(), Owner("", ""))
-    )
+val gistExpectedResponse = listOf(
+    Gist("12345", "", Date(), HashMap(), Owner("", "")),
+    Gist("123456", "", Date(), HashMap(), Owner("", "")),
+    Gist("1234567", "", Date(), HashMap(), Owner("", ""))
+)
 
 val starredGistExpectedValue = Gist("", "", Date(), HashMap(), Owner("", ""), starred = true)
 

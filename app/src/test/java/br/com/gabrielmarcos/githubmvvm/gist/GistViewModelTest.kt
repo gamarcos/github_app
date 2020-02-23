@@ -2,16 +2,16 @@ package br.com.gabrielmarcos.githubmvvm.gist
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import br.com.gabrielmarcos.githubmvvm.core.TrampolineSchedulerRule
-import br.com.gabrielmarcos.githubmvvm.model.Gist
 import br.com.gabrielmarcos.githubmvvm.utils.favExpectedResponse
+import br.com.gabrielmarcos.githubmvvm.utils.getOrAwaitValue
 import br.com.gabrielmarcos.githubmvvm.utils.gistExpectedResponse
 import br.com.gabrielmarcos.githubmvvm.utils.starredGistExpectedValue
 import br.com.gabrielmarcos.githubmvvm.utils.unstarredGistExpectedValue
 import io.reactivex.Completable
-import io.reactivex.Single
 import io.reactivex.Single.just
-import io.reactivex.observers.TestObserver
-import org.junit.Assert
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -37,13 +37,10 @@ class GistViewModelTest {
 
     private lateinit var viewModel: GistViewModel
 
-    private lateinit var testObserver: TestObserver<Single<List<Gist>>>
-
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
         viewModel = GistViewModel(gistRepository)
-        testObserver = TestObserver()
     }
 
     @Test
@@ -54,12 +51,7 @@ class GistViewModelTest {
 
         viewModel.connectionAvailability = true
         viewModel.getGistList()
-
-        verify(gistRepository, times(1)).getGistList(0, true)
-        verify(gistRepository, times(1)).getSavedFavoriteGist()
-        verify(gistRepository, times(1)).saveLocalGist(emptyList())
-
-        testObserver.assertNoErrors()
+        assertGistResultList()
     }
 
     @Test
@@ -70,8 +62,16 @@ class GistViewModelTest {
         viewModel.getLocalFavoriteList()
 
         verify(gistRepository, times(1)).getSavedFavoriteGist()
-        Assert.assertTrue(viewModel.favIdList.size == 3)
-        testObserver.assertNoErrors()
+
+        assertTrue(viewModel.favIdList.size == 3)
+
+        viewModel.gistListViewState.getOrAwaitValue().run {
+            assertNotNull(this)
+        }
+
+        viewModel.resultSuccess.getOrAwaitValue().run {
+            assertNotNull(this)
+        }
     }
 
     @Test
@@ -82,8 +82,14 @@ class GistViewModelTest {
 
         verify(gistRepository, times(1)).getGist("", true)
 
-        testObserver.assertNoErrors()
-        testObserver.assertNoErrors()
+        viewModel.gistDetailViewState.getOrAwaitValue().run {
+            assertNotNull(this)
+            assertTrue(this == starredGistExpectedValue)
+        }
+
+        viewModel.resultSuccess.getOrAwaitValue().run {
+            assertNotNull(this)
+        }
     }
 
     @Test
@@ -93,8 +99,6 @@ class GistViewModelTest {
         viewModel.saveLocalResponse(emptyList())
 
         verify(gistRepository, times(1)).saveLocalGist(emptyList())
-
-        testObserver.assertNoErrors()
     }
 
     @Test
@@ -106,12 +110,10 @@ class GistViewModelTest {
 
         verify(gistRepository, times(1)).setFavoriteGist(starredGistExpectedValue)
         verify(gistRepository, times(0)).deletFavoriteGistById("")
-
-        testObserver.assertNoErrors()
     }
 
     @Test
-    fun `when gist was  starred then delete gist in local database`() {
+    fun `when gist was starred then delete gist in local database`() {
         `when`(gistRepository.deletFavoriteGistById(unstarredGistExpectedValue.gistId)).thenReturn(
             Completable.complete()
         )
@@ -120,7 +122,38 @@ class GistViewModelTest {
 
         verify(gistRepository, times(0)).setFavoriteGist(unstarredGistExpectedValue)
         verify(gistRepository, times(1)).deletFavoriteGistById(unstarredGistExpectedValue.gistId)
+    }
 
-        testObserver.assertNoErrors()
+    @Test
+    fun `when update gist list then update current position assert that not null`() {
+        val page = 1
+        `when`(gistRepository.getGistList(page, true)).thenReturn(just(gistExpectedResponse))
+        `when`(gistRepository.getSavedFavoriteGist()).thenReturn(favExpectedResponse)
+        `when`(gistRepository.saveLocalGist(emptyList())).thenReturn(Completable.complete())
+
+        viewModel.currentPage = 0
+        viewModel.connectionAvailability = true
+        viewModel.updateGistList()
+
+        assertEquals(viewModel.currentPage, page)
+        assertGistResultList(page = page)
+    }
+
+    private fun assertGistResultList(page: Int = 0) {
+        verify(gistRepository, times(1)).getGistList(page, true)
+        verify(gistRepository, times(1)).getSavedFavoriteGist()
+        verify(gistRepository, times(1)).saveLocalGist(emptyList())
+
+        viewModel.showLoading.getOrAwaitValue().run {
+            assertNotNull(getContentIfNotHandled())
+        }
+
+        viewModel.gistListViewState.getOrAwaitValue().run {
+            assertNotNull(this)
+        }
+
+        viewModel.resultSuccess.getOrAwaitValue().run {
+            assertNotNull(this)
+        }
     }
 }

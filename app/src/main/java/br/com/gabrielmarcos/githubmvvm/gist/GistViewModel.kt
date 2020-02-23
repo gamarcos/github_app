@@ -26,6 +26,7 @@ open class GistViewModel @Inject constructor(
     internal val resultSuccess: MutableLiveData<Event<Unit>> = MutableLiveData()
 
     fun getGistList() {
+        showLoading.value = Event(Unit)
         disposableRxThread(
             gistRepository.getGistList(currentPage, connectionAvailability),
             { handleGistListResult(it) },
