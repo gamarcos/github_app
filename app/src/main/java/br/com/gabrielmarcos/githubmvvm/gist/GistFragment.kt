@@ -6,11 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import br.com.gabrielmarcos.githubmvvm.data.EventObserver
 import br.com.gabrielmarcos.githubmvvm.R
 import br.com.gabrielmarcos.githubmvvm.base.view.BaseFragment
+import br.com.gabrielmarcos.githubmvvm.data.EventObserver
+import br.com.gabrielmarcos.githubmvvm.extensions.activityViewModelProvider
 import br.com.gabrielmarcos.githubmvvm.extensions.hide
-import br.com.gabrielmarcos.githubmvvm.extensions.injectViewModel
 import br.com.gabrielmarcos.githubmvvm.extensions.show
 import br.com.gabrielmarcos.githubmvvm.model.Gist
 import br.com.gabrielmarcos.githubmvvm.util.InfiniteScrollListener
@@ -44,7 +44,7 @@ class GistFragment : BaseFragment() {
     }
 
     private fun setUpViewModel() {
-        viewModel = injectViewModel(viewModelFactory)
+        viewModel = activityViewModelProvider(viewModelFactory)
         viewModel.connectionAvailability = InternetUtil.isInternetOn()
         viewModel.getGistList()
     }

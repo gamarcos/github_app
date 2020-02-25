@@ -15,9 +15,12 @@ open class GistViewModel @Inject constructor(
     var currentPage = 0
     var connectionAvailability: Boolean = false
 
+    private var neededUpdate: Boolean = false
+
     // Only For testes uuuh ugly :(
     internal var listResult: List<Gist> = emptyList()
     internal var favIdList: List<String> = emptyList()
+
     internal val showSnackbarMessage: MutableLiveData<Event<String>> = MutableLiveData()
     internal val showLoading: MutableLiveData<Event<Unit>> = MutableLiveData()
     internal val gistListViewState: MutableLiveData<List<Gist>> = MutableLiveData()
@@ -41,7 +44,9 @@ open class GistViewModel @Inject constructor(
         } ?: postEmptyResult()
     }
 
-    private fun postEmptyResult() { emptyResult.value = Event(Unit) }
+    private fun postEmptyResult() {
+        emptyResult.value = Event(Unit)
+    }
 
     fun getLocalFavoriteList() {
         disposableRxThread(
@@ -115,7 +120,5 @@ open class GistViewModel @Inject constructor(
         getGistList()
     }
 
-    fun filterGistOwner(ownerLogin: String?) {
-        //TODO Searchview needed share viewmodel between activity and fragment
-    }
+    fun checkOwnerFilter(ownerLogin: String?) {}
 }

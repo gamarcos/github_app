@@ -13,4 +13,6 @@
     <item name="gist_empty_error_title" type="string">No results found</item>
     <item name="gist_empty_error_description" type="string">"We can't find any item matching your search"</item>
 
+    <item name="gist_feature_in_progress" type="string">Feature in progress</item>
+
 </resources>
