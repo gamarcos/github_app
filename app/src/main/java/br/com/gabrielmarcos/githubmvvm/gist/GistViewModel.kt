@@ -5,6 +5,7 @@ import br.com.gabrielmarcos.githubmvvm.base.gateway.RxViewModel
 import br.com.gabrielmarcos.githubmvvm.data.Event
 import br.com.gabrielmarcos.githubmvvm.model.FavModel
 import br.com.gabrielmarcos.githubmvvm.model.Gist
+import br.com.gabrielmarcos.githubmvvm.util.InternetUtil
 import javax.inject.Inject
 
 open class GistViewModel @Inject constructor(
@@ -12,18 +13,18 @@ open class GistViewModel @Inject constructor(
 ) : RxViewModel() {
 
     var currentPage = 0
-    var connectionAvailability: Boolean = true
+    var connectionAvailability: Boolean = false
 
     // Only For testes uuuh ugly :(
     internal var listResult: List<Gist> = emptyList()
     internal var favIdList: List<String> = emptyList()
-
     internal val showSnackbarMessage: MutableLiveData<Event<String>> = MutableLiveData()
     internal val showLoading: MutableLiveData<Event<Unit>> = MutableLiveData()
     internal val gistListViewState: MutableLiveData<List<Gist>> = MutableLiveData()
     internal val gistDetailViewState: MutableLiveData<Gist> = MutableLiveData()
     internal val resultError: MutableLiveData<Event<Unit>> = MutableLiveData()
     internal val resultSuccess: MutableLiveData<Event<Unit>> = MutableLiveData()
+    internal val emptyResult: MutableLiveData<Event<Unit>> = MutableLiveData()
 
     fun getGistList() {
         showLoading.value = Event(Unit)
@@ -34,9 +35,13 @@ open class GistViewModel @Inject constructor(
     }
 
     private fun handleGistListResult(gist: List<Gist>) {
-        getLocalFavoriteList()
-        listResult = gist
+        takeIf { gist.isNotEmpty() }?.run {
+            getLocalFavoriteList()
+            listResult = gist
+        } ?: postEmptyResult()
     }
+
+    private fun postEmptyResult() { emptyResult.value = Event(Unit) }
 
     fun getLocalFavoriteList() {
         disposableRxThread(

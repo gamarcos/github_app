@@ -22,6 +22,8 @@ class GistFragment : BaseFragment() {
 
     private lateinit var viewModel: GistViewModel
 
+    private var neededUpdate = false
+
     private val gistAdapter = GistAdapter(
         { gist -> onItemSelected(gist) },
         { gist -> onFavoriteItemSelected(gist) }
@@ -37,6 +39,7 @@ class GistFragment : BaseFragment() {
         setUpViewModel()
         setUpObservables()
         setUpAdapter()
+        setUpNetworkObserve()
         setUpSnackbar(this.view!!, viewModel.showSnackbarMessage)
     }
 
@@ -46,26 +49,62 @@ class GistFragment : BaseFragment() {
         viewModel.getGistList()
     }
 
+    private fun setUpNetworkObserve() {
+        InternetUtil.observe(this, Observer { hasNetwork ->
+            viewModel.connectionAvailability = hasNetwork
+            checkNetworkConnection(hasNetwork)
+        })
+    }
+
+    private fun checkNetworkConnection(hasNetwork: Boolean) {
+        takeIf { !hasNetwork }?.run {
+            neededUpdate = true
+        } ?: checkRefreshList()
+    }
+
+    private fun checkRefreshList() {
+        takeIf { neededUpdate }?.run {
+            viewModel.getGistList()
+            neededUpdate = false
+        }
+    }
+
     private fun setUpObservables() {
-        viewModel.gistListViewState.observe(viewLifecycleOwner, Observer { viewState ->
-            gistAdapter.items = viewState
-        })
+        viewModel.gistListViewState.observe(viewLifecycleOwner, Observer { gistAdapter.items = it })
 
-        viewModel.showLoading.observe(viewLifecycleOwner, EventObserver {
-            gistProgressBar.show()
-        })
+        viewModel.showLoading.observe(viewLifecycleOwner, EventObserver { gistProgressBar.show() })
 
-        viewModel.resultError.observe(viewLifecycleOwner, EventObserver {
-            gistGroupError.show()
-            gistProgressBar.hide()
-            gistRecyclerView.hide()
-        })
+        viewModel.resultSuccess.observe(viewLifecycleOwner, EventObserver { showSuccessLayout() })
 
-        viewModel.resultSuccess.observe(viewLifecycleOwner, EventObserver {
-            gistRecyclerView.show()
-            gistGroupError.hide()
-            gistProgressBar.hide()
-        })
+        viewModel.emptyResult.observe(viewLifecycleOwner, EventObserver { setUpEmptyLayout() })
+
+        viewModel.resultError.observe(viewLifecycleOwner, EventObserver { setUpErrorLayout() })
+    }
+
+    private fun showSuccessLayout() {
+        gistRecyclerView.show()
+        gistGroupError.hide()
+        gistProgressBar.hide()
+    }
+
+    private fun setUpEmptyLayout() {
+        gistErrorIcon.setImageResource(R.drawable.ic_not_found)
+        gistErrorTitle.text = getString(R.string.gist_empty_error_title)
+        gistErrorMessage.text = getString(R.string.gist_empty_error_description)
+        showHandleProblemLayout()
+    }
+
+    private fun setUpErrorLayout() {
+        gistErrorIcon.setImageResource(R.drawable.ic_problem)
+        gistErrorTitle.text = getString(R.string.gist_error_title)
+        gistErrorMessage.text = getString(R.string.gist_error_description)
+        showHandleProblemLayout()
+    }
+
+    private fun showHandleProblemLayout() {
+        gistGroupError.show()
+        gistProgressBar.hide()
+        gistRecyclerView.hide()
     }
 
     private fun setUpAdapter() {
@@ -73,8 +112,11 @@ class GistFragment : BaseFragment() {
         gistRecyclerView.apply {
             layoutManager = linearLayout
             adapter = gistAdapter
-            addOnScrollListener(InfiniteScrollListener(
-                { updateList() }, linearLayout))
+            addOnScrollListener(
+                InfiniteScrollListener(
+                    { updateList() }, linearLayout
+                )
+            )
         }
     }
 

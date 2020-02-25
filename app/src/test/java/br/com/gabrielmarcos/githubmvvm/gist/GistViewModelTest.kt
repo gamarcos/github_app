@@ -8,6 +8,7 @@ import br.com.gabrielmarcos.githubmvvm.utils.gistExpectedResponse
 import br.com.gabrielmarcos.githubmvvm.utils.starredGistExpectedValue
 import br.com.gabrielmarcos.githubmvvm.utils.unstarredGistExpectedValue
 import io.reactivex.Completable
+import io.reactivex.Single.error
 import io.reactivex.Single.just
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -22,6 +23,10 @@ import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
+
+private const val FIRST_PAGE = 0
+private const val SECOND_PAGE = 1
+private const val EXPECTED_FAV_LIST_SIZE = 3
 
 @RunWith(MockitoJUnitRunner::class)
 class GistViewModelTest {
@@ -45,7 +50,7 @@ class GistViewModelTest {
 
     @Test
     fun `when remote gist list response success then assert no errors`() {
-        `when`(gistRepository.getGistList(0, true)).thenReturn(just(gistExpectedResponse))
+        `when`(gistRepository.getGistList(FIRST_PAGE, true)).thenReturn(just(gistExpectedResponse))
         `when`(gistRepository.getSavedFavoriteGist()).thenReturn(favExpectedResponse)
         `when`(gistRepository.saveLocalGist(emptyList())).thenReturn(Completable.complete())
 
@@ -55,28 +60,56 @@ class GistViewModelTest {
     }
 
     @Test
+    fun `when remote gist list response error then assert that snack error is showed`() {
+        val expectedError = RuntimeException("RuntimeException")
+        `when`(gistRepository.getGistList(FIRST_PAGE, true)).thenReturn(error(expectedError))
+
+        viewModel.connectionAvailability = true
+        viewModel.getGistList()
+
+        verify(gistRepository, times(1)).getGistList(FIRST_PAGE, true)
+        verify(gistRepository, times(0)).getSavedFavoriteGist()
+        verify(gistRepository, times(0)).saveLocalGist(emptyList())
+
+        assertHandleErrorResult(expectedError.message ?: "")
+    }
+
+    @Test
+    fun `when remote gist list is empty then assert empty layout is showed`() {
+        `when`(gistRepository.getGistList(FIRST_PAGE, true)).thenReturn(just(emptyList()))
+
+        viewModel.connectionAvailability = true
+        viewModel.getGistList()
+
+        verify(gistRepository, times(1)).getGistList(FIRST_PAGE, true)
+        verify(gistRepository, times(0)).getSavedFavoriteGist()
+        verify(gistRepository, times(0)).saveLocalGist(emptyList())
+
+        assertTrue(viewModel.listResult.isEmpty())
+        viewModel.emptyResult.getOrAwaitValue().run { assertNotNull(this) }
+    }
+
+    @Test
     fun `when local favorite gist list response success then assert that favorite id list has the same size`() {
         `when`(gistRepository.getSavedFavoriteGist()).thenReturn(favExpectedResponse)
         `when`(gistRepository.saveLocalGist(emptyList())).thenReturn(Completable.complete())
+
         viewModel.connectionAvailability = true
         viewModel.getLocalFavoriteList()
 
         verify(gistRepository, times(1)).getSavedFavoriteGist()
 
-        assertTrue(viewModel.favIdList.size == 3)
+        assertTrue(viewModel.favIdList.size == EXPECTED_FAV_LIST_SIZE)
 
-        viewModel.gistListViewState.getOrAwaitValue().run {
-            assertNotNull(this)
-        }
+        viewModel.gistListViewState.getOrAwaitValue().run { assertNotNull(this) }
 
-        viewModel.resultSuccess.getOrAwaitValue().run {
-            assertNotNull(this)
-        }
+        viewModel.resultSuccess.getOrAwaitValue().run { assertNotNull(this) }
     }
 
     @Test
     fun `when remote gist response success then assert no errors`() {
         `when`(gistRepository.getGist("", true)).thenReturn(just(starredGistExpectedValue))
+
         viewModel.connectionAvailability = true
         viewModel.getGist("")
 
@@ -90,6 +123,19 @@ class GistViewModelTest {
         viewModel.resultSuccess.getOrAwaitValue().run {
             assertNotNull(this)
         }
+    }
+
+    @Test
+    fun `when remote gist response error then assert that snack is showed`() {
+        val expectedError = RuntimeException("RuntimeException")
+        `when`(gistRepository.getGist("", true)).thenReturn(error(expectedError))
+
+        viewModel.connectionAvailability = true
+        viewModel.getGist("")
+
+        verify(gistRepository, times(1)).getGist("", true)
+
+        assertHandleErrorResult(expectedError.message ?: "")
     }
 
     @Test
@@ -114,9 +160,7 @@ class GistViewModelTest {
 
     @Test
     fun `when gist was starred then delete gist in local database`() {
-        `when`(gistRepository.deletFavoriteGistById(unstarredGistExpectedValue.gistId)).thenReturn(
-            Completable.complete()
-        )
+        `when`(gistRepository.deletFavoriteGistById(unstarredGistExpectedValue.gistId)).thenReturn(Completable.complete())
         viewModel.connectionAvailability = true
         viewModel.handleFavoriteState(unstarredGistExpectedValue)
 
@@ -126,20 +170,19 @@ class GistViewModelTest {
 
     @Test
     fun `when update gist list then update current position assert that not null`() {
-        val page = 1
-        `when`(gistRepository.getGistList(page, true)).thenReturn(just(gistExpectedResponse))
+        `when`(gistRepository.getGistList(SECOND_PAGE, true)).thenReturn(just(gistExpectedResponse))
         `when`(gistRepository.getSavedFavoriteGist()).thenReturn(favExpectedResponse)
         `when`(gistRepository.saveLocalGist(emptyList())).thenReturn(Completable.complete())
 
-        viewModel.currentPage = 0
+        viewModel.currentPage = FIRST_PAGE
         viewModel.connectionAvailability = true
         viewModel.updateGistList()
 
-        assertEquals(viewModel.currentPage, page)
-        assertGistResultList(page = page)
+        assertEquals(viewModel.currentPage, SECOND_PAGE)
+        assertGistResultList(page = SECOND_PAGE)
     }
 
-    private fun assertGistResultList(page: Int = 0) {
+    private fun assertGistResultList(page: Int = FIRST_PAGE) {
         verify(gistRepository, times(1)).getGistList(page, true)
         verify(gistRepository, times(1)).getSavedFavoriteGist()
         verify(gistRepository, times(1)).saveLocalGist(emptyList())
@@ -154,6 +197,17 @@ class GistViewModelTest {
 
         viewModel.resultSuccess.getOrAwaitValue().run {
             assertNotNull(this)
+        }
+    }
+
+    private fun assertHandleErrorResult(expectedErrorMessage: String) {
+        viewModel.resultError.getOrAwaitValue().run {
+            assertNotNull(this)
+        }
+
+        viewModel.showSnackbarMessage.getOrAwaitValue().run {
+            assertNotNull(this)
+            assertTrue(this.peekContent() == expectedErrorMessage)
         }
     }
 }
