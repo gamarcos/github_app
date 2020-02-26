@@ -8,6 +8,7 @@ import br.com.gabrielmarcos.githubmvvm.utils.gistExpectedResponse
 import br.com.gabrielmarcos.githubmvvm.utils.starredGistExpectedValue
 import br.com.gabrielmarcos.githubmvvm.utils.unstarredGistExpectedValue
 import io.reactivex.Completable
+import io.reactivex.Flowable
 import io.reactivex.Single.error
 import io.reactivex.Single.just
 import org.junit.Assert.assertEquals
@@ -50,7 +51,11 @@ class GistViewModelTest {
 
     @Test
     fun `when remote gist list response success then assert no errors`() {
-        `when`(gistRepository.getGistList(FIRST_PAGE, true)).thenReturn(just(gistExpectedResponse))
+        `when`(gistRepository.getGistList(FIRST_PAGE, true)).thenReturn(
+            Flowable.just(
+                gistExpectedResponse
+            )
+        )
         `when`(gistRepository.getSavedFavoriteGist()).thenReturn(favExpectedResponse)
         `when`(gistRepository.saveLocalGist(emptyList())).thenReturn(Completable.complete())
 
@@ -62,7 +67,9 @@ class GistViewModelTest {
     @Test
     fun `when remote gist list response error then assert that snack error is showed`() {
         val expectedError = RuntimeException("RuntimeException")
-        `when`(gistRepository.getGistList(FIRST_PAGE, true)).thenReturn(error(expectedError))
+        `when`(gistRepository.getGistList(FIRST_PAGE, true))
+            .thenReturn(Flowable.error(expectedError))
+
 
         viewModel.connectionAvailability = true
         viewModel.getGistList()
@@ -76,7 +83,7 @@ class GistViewModelTest {
 
     @Test
     fun `when remote gist list is empty then assert empty layout is showed`() {
-        `when`(gistRepository.getGistList(FIRST_PAGE, true)).thenReturn(just(emptyList()))
+        `when`(gistRepository.getGistList(FIRST_PAGE, true)).thenReturn(Flowable.just(emptyList()))
 
         viewModel.connectionAvailability = true
         viewModel.getGistList()
@@ -160,7 +167,9 @@ class GistViewModelTest {
 
     @Test
     fun `when gist was starred then delete gist in local database`() {
-        `when`(gistRepository.deletFavoriteGistById(unstarredGistExpectedValue.gistId)).thenReturn(Completable.complete())
+        `when`(gistRepository.deletFavoriteGistById(unstarredGistExpectedValue.gistId)).thenReturn(
+            Completable.complete()
+        )
         viewModel.connectionAvailability = true
         viewModel.handleFavoriteState(unstarredGistExpectedValue)
 
@@ -170,7 +179,11 @@ class GistViewModelTest {
 
     @Test
     fun `when update gist list then update current position assert that not null`() {
-        `when`(gistRepository.getGistList(SECOND_PAGE, true)).thenReturn(just(gistExpectedResponse))
+        `when`(gistRepository.getGistList(SECOND_PAGE, true)).thenReturn(
+            Flowable.just(
+                gistExpectedResponse
+            )
+        )
         `when`(gistRepository.getSavedFavoriteGist()).thenReturn(favExpectedResponse)
         `when`(gistRepository.saveLocalGist(emptyList())).thenReturn(Completable.complete())
 

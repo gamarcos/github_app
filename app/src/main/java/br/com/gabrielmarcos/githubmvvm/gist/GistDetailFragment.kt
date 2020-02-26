@@ -38,9 +38,7 @@ class GistDetailFragment : BaseFragment() {
     }
 
     private fun setUpObservables() {
-        viewModel.gistDetailViewState.observe(viewLifecycleOwner, Observer {
-            setUpView(it)
-        })
+        viewModel.gistDetailViewState.observe(viewLifecycleOwner, Observer { setUpView(it) })
     }
 
     private fun setUpView(gist : Gist) {

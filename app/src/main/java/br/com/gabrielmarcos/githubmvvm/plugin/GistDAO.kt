@@ -6,12 +6,13 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import br.com.gabrielmarcos.githubmvvm.model.Gist
 import io.reactivex.Completable
+import io.reactivex.Flowable
 import io.reactivex.Single
 
 @Dao
 interface GistDAO {
     @Query("SELECT * FROM gist ORDER BY gistId DESC")
-    fun getAllGists(): Single<List<Gist>>
+    fun getAllGists(): Flowable<List<Gist>>
 
     @Query("SELECT * FROM gist WHERE gistId = :id")
     fun getGistById(id: String): Single<Gist>

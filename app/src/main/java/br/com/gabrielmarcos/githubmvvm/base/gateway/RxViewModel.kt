@@ -8,7 +8,6 @@ import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 
 open class RxViewModel : ViewModel() {
     private val disposables: CompositeDisposable = CompositeDisposable()
@@ -30,6 +29,23 @@ open class RxViewModel : ViewModel() {
     }
 
     fun <P> disposableRxThread(
+        flowable: Flowable<P>,
+        subscribeSuccess: (result: P) -> Unit,
+        subscribeError: (t: Throwable) -> Unit
+    ) {
+        addToDisposable(
+            flowable
+                .subscribeOn(SchedulersFacade.io())
+                .observeOn(SchedulersFacade.ui())
+                .doOnError { subscribeError(it) }
+                .subscribe(
+                    { success -> subscribeSuccess(success) },
+                    { error -> subscribeError(error) }
+                )
+        )
+    }
+
+    fun <P> disposableRxThread(
         single: Single<P>,
         subscribeSuccess: (result: P) -> Unit,
         subscribeError: (t: Throwable) -> Unit
@@ -39,7 +55,6 @@ open class RxViewModel : ViewModel() {
                 .subscribeOn(SchedulersFacade.io())
                 .observeOn(SchedulersFacade.ui())
                 .doOnError { subscribeError(it) }
-                .retryWhen { it.retryWithDelay(3, 2000) }
                 .subscribe(
                     { success -> subscribeSuccess(success) },
                     { error -> subscribeError(error) }
@@ -50,18 +65,5 @@ open class RxViewModel : ViewModel() {
     override fun onCleared() {
         disposables.clear()
         super.onCleared()
-    }
-
-    fun <T> Flowable<T>.retryWithDelay(maxRetries: Int, retryDelayMillis: Int): Flowable<T> {
-        var retryCount = 0
-        return retryWhen { thObservable ->
-            thObservable.flatMap { throwable ->
-                if (++retryCount < maxRetries) {
-                    Flowable.timer(retryDelayMillis.toLong(), TimeUnit.MILLISECONDS)
-                } else {
-                    Flowable.error(throwable)
-                }
-            }
-        }
     }
 }

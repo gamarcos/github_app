@@ -7,6 +7,7 @@ import br.com.gabrielmarcos.githubmvvm.utils.gistExpectedResponse
 import br.com.gabrielmarcos.githubmvvm.utils.starredGistExpectedValue
 import br.com.gabrielmarcos.githubmvvm.utils.unstarredGistExpectedValue
 import io.reactivex.Completable
+import io.reactivex.Flowable
 import io.reactivex.Single.just
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
@@ -42,7 +43,7 @@ class GistRepositoryImplTest {
 
     @Test
     fun `when get gistList local database assert result not null`() {
-        `when`(gistDAO.getAllGists()).thenReturn(just(gistExpectedResponse))
+        `when`(gistDAO.getAllGists()).thenReturn(Flowable.just(gistExpectedResponse))
         val testObserver = repository.getGistList(0, false).test()
         testObserver.assertComplete()
         testObserver.assertValue {

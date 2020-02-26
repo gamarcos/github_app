@@ -4,6 +4,7 @@ import br.com.gabrielmarcos.githubmvvm.gist.GistRepository
 import br.com.gabrielmarcos.githubmvvm.model.FavModel
 import br.com.gabrielmarcos.githubmvvm.model.Gist
 import io.reactivex.Completable
+import io.reactivex.Flowable
 import io.reactivex.Single
 import javax.inject.Inject
 
@@ -13,7 +14,7 @@ class GistRepositoryImpl @Inject constructor(
     private val favoritesDAO: FavoritesDAO
 ) : GistRepository {
 
-    override fun getGistList(page: Int, connectionAvailability: Boolean): Single<List<Gist>> {
+    override fun getGistList(page: Int, connectionAvailability: Boolean): Flowable<List<Gist>> {
         return takeIf { connectionAvailability }?.run {
             gistService.getGists(page)
         } ?: gistDAO.getAllGists()
