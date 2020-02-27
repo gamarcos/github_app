@@ -7,7 +7,6 @@ import br.com.gabrielmarcos.githubmvvm.utils.gistExpectedResponse
 import br.com.gabrielmarcos.githubmvvm.utils.starredGistExpectedValue
 import br.com.gabrielmarcos.githubmvvm.utils.unstarredGistExpectedValue
 import io.reactivex.Completable
-import io.reactivex.Flowable
 import io.reactivex.Single.just
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
@@ -21,8 +20,6 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 class GistRepositoryImplTest {
-
-    // TODO Implements access to room to veriry results
 
     @Mock
     private lateinit var gistDAO: GistDAO
@@ -43,7 +40,7 @@ class GistRepositoryImplTest {
 
     @Test
     fun `when get gistList local database assert result not null`() {
-        `when`(gistDAO.getAllGists()).thenReturn(Flowable.just(gistExpectedResponse))
+        `when`(gistDAO.getAllGists()).thenReturn(just(gistExpectedResponse))
         val testObserver = repository.getGistList(0, false).test()
         testObserver.assertComplete()
         testObserver.assertValue {
@@ -56,7 +53,7 @@ class GistRepositoryImplTest {
     @Test
     fun `when save local gist list database assert not error`() {
         `when`(gistDAO.insertAll(gistExpectedResponse)).thenReturn(Completable.complete())
-        val testObserver = repository.saveLocalGist(gistExpectedResponse).test()
+        val testObserver = repository.setLocalGist(gistExpectedResponse).test()
 
         testObserver.assertNoErrors()
     }

@@ -3,7 +3,6 @@ package br.com.gabrielmarcos.githubmvvm.base.gateway
 import androidx.lifecycle.ViewModel
 import br.com.gabrielmarcos.githubmvvm.base.rx.SchedulersFacade
 import io.reactivex.Completable
-import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -16,36 +15,22 @@ open class RxViewModel : ViewModel() {
         disposables.add(disposable)
     }
 
-    fun disposableRxThread(
+    fun scheduleCompletableThread(
         completable: Completable
     ) {
         addToDisposable(
             completable
                 .subscribeOn(SchedulersFacade.io())
                 .observeOn(SchedulersFacade.ui())
-                .subscribe({ Timber.i("On Success: RxViewModel") },
-                    { Timber.i("On Error: RxViewModel") })
-        )
-    }
-
-    fun <P> disposableRxThread(
-        flowable: Flowable<P>,
-        subscribeSuccess: (result: P) -> Unit,
-        subscribeError: (t: Throwable) -> Unit
-    ) {
-        addToDisposable(
-            flowable
-                .subscribeOn(SchedulersFacade.io())
-                .observeOn(SchedulersFacade.ui())
-                .doOnError { subscribeError(it) }
+                .doOnComplete { Timber.i("Do On Success: RxViewModel") }
+                .doOnError { Timber.i("Do On Error: RxViewModel") }
                 .subscribe(
-                    { success -> subscribeSuccess(success) },
-                    { error -> subscribeError(error) }
-                )
+                    { Timber.i("Subscribe On Success: RxViewModel") },
+                    { Timber.i("Subscribe On Error: RxViewModel") })
         )
     }
 
-    fun <P> disposableRxThread(
+    fun <P> scheduleSingleThread(
         single: Single<P>,
         subscribeSuccess: (result: P) -> Unit,
         subscribeError: (t: Throwable) -> Unit
