@@ -10,7 +10,7 @@ import retrofit2.http.Query
 interface GitService {
 
     @GET("/gists/public")
-    fun getGists(@Query("page") page: Int): Observable<List<Gist>>
+    fun getGists(@Query("page") page: Int): Single<List<Gist>>
 
     @GET("/gists/{id}")
     fun getGist(@Path("id") id: String): Single<Gist>

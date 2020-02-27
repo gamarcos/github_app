@@ -14,7 +14,7 @@ class GistRepositoryImpl @Inject constructor(
     private val favoritesDAO: FavoritesDAO
 ) : GistRepository {
 
-    override fun getGistList(page: Int, connectionAvailability: Boolean): Observable<List<Gist>> {
+    override fun getGistList(page: Int, connectionAvailability: Boolean): Single<List<Gist>> {
         return if (connectionAvailability) {
             gistService.getGists(page)
         } else

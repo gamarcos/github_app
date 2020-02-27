@@ -71,7 +71,7 @@ open class GistViewModel @Inject constructor(
     private fun handleSuccess(gists: List<Gist>) {
         gistListViewState.value = gists
         resultSuccess.value = Event(Unit)
-        // saveLocalResponse(gists)
+        saveLocalResponse(gists)
     }
 
     private fun handleListUpdate(): List<Gist> {

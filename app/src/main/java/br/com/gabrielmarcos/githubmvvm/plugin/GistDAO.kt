@@ -12,7 +12,7 @@ import io.reactivex.Single
 @Dao
 interface GistDAO {
     @Query("SELECT * FROM gist")
-    fun getAllGists(): Observable<List<Gist>>
+    fun getAllGists(): Single<List<Gist>>
 
     @Query("SELECT * FROM gist WHERE gistId = :id")
     fun getGistById(id: String): Single<Gist>
