@@ -39,6 +39,7 @@ class GistFragment : BaseFragment() {
         setUpAdapter()
         setUpNetworkObserve()
         setUpRefresh()
+        gistRefresh.isRefreshing = true
         setUpSnackbar(this.view!!, viewModel.showSnackbarMessage)
     }
 
