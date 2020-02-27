@@ -14,7 +14,8 @@ This is a project that uses observables in Room, with RxJava's Single`s objects.
  - Show detail owner gist
     - name
     - photo
- - Search for owner name (TODO)
+ - Search for owner name
+ - Swipe refresh
     
 ### Project Architecture
 
@@ -36,6 +37,7 @@ The following strategies were used for local storage, data connection, asynchron
  - Retrofit
  - Dagger2
  - Room
+ - Navigation
  
 ### API
 https://developer.github.com/v3/
