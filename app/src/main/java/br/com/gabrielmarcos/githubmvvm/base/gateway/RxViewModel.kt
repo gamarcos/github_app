@@ -3,7 +3,6 @@ package br.com.gabrielmarcos.githubmvvm.base.gateway
 import androidx.lifecycle.ViewModel
 import br.com.gabrielmarcos.githubmvvm.base.rx.SchedulersFacade
 import io.reactivex.Completable
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -13,12 +12,10 @@ open class RxViewModel : ViewModel() {
     private val disposables: CompositeDisposable = CompositeDisposable()
 
     fun addToDisposable(disposable: Disposable) {
-        disposables.add(
-            disposable
-        )
+        disposables.add(disposable)
     }
 
-    fun disposableRxThread(
+    fun scheduleCompletableThread(
         completable: Completable
     ) {
         addToDisposable(
@@ -33,24 +30,7 @@ open class RxViewModel : ViewModel() {
         )
     }
 
-    fun <P> disposableRxThread(
-        observable: Observable<P>,
-        subscribeSuccess: (result: P) -> Unit,
-        subscribeError: (t: Throwable) -> Unit
-    ) {
-        addToDisposable(
-            observable
-                .subscribeOn(SchedulersFacade.io())
-                .observeOn(SchedulersFacade.ui())
-                .doOnError { subscribeError(it) }
-                .subscribe(
-                    { success -> subscribeSuccess(success) },
-                    { error -> subscribeError(error) }
-                )
-        )
-    }
-
-    fun <P> disposableRxThread(
+    fun <P> scheduleSingleThread(
         single: Single<P>,
         subscribeSuccess: (result: P) -> Unit,
         subscribeError: (t: Throwable) -> Unit

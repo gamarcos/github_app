@@ -7,10 +7,11 @@ import io.reactivex.Observable
 import io.reactivex.Single
 
 interface GistRepository {
+    //Gists
     fun getGistList(page: Int, connectionAvailability: Boolean): Single<List<Gist>>
     fun getGist(uuid: String, connectionAvailability: Boolean): Single<Gist>
-    fun saveLocalGist(gist: List<Gist>): Completable
+    fun setLocalGist(gist: List<Gist>): Completable
     fun setFavoriteGist(gist: Gist): Completable
     fun deletFavoriteGistById(id: String): Completable
-    fun getSavedFavoriteGist(): Observable<List<FavModel>>
+    fun getSavedFavoriteGist(): Single<List<FavModel>>
 }

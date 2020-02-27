@@ -21,7 +21,7 @@ class GistRepositoryImpl @Inject constructor(
             gistDAO.getAllGists()
     }
 
-    override fun saveLocalGist(gist: List<Gist>): Completable = gistDAO.insertAll(gist)
+    override fun setLocalGist(gist: List<Gist>): Completable = gistDAO.insertAll(gist)
 
     override fun setFavoriteGist(gist: Gist): Completable =
         favoritesDAO.insertFavGists(FavModel(0, gist.gistId))
@@ -33,5 +33,5 @@ class GistRepositoryImpl @Inject constructor(
             ?: gistDAO.getGistById(uuid)
     }
 
-    override fun getSavedFavoriteGist(): Observable<List<FavModel>> = favoritesDAO.getAllFavGists()
+    override fun getSavedFavoriteGist(): Single<List<FavModel>> = favoritesDAO.getAllFavGists()
 }
