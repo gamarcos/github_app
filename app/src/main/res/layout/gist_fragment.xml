@@ -20,25 +20,25 @@
         android:id="@+id/gistErrorTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/gist_error_title"
         android:layout_marginTop="@dimen/margin_normal"
         android:gravity="center"
+        android:text="@string/gist_error_title"
         android:textSize="@dimen/text_size_error_title"
         app:layout_constraintEnd_toEndOf="@+id/gistErrorIcon"
         app:layout_constraintStart_toStartOf="@+id/gistErrorIcon"
-        app:layout_constraintTop_toBottomOf="@+id/gistErrorIcon"/>
+        app:layout_constraintTop_toBottomOf="@+id/gistErrorIcon" />
 
     <TextView
         android:id="@+id/gistErrorMessage"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:text="@string/gist_error_description"
         android:layout_margin="@dimen/margin_normal"
         android:gravity="center"
+        android:text="@string/gist_error_description"
         android:textSize="@dimen/text_size_error_description"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/gistErrorTitle"/>
+        app:layout_constraintTop_toBottomOf="@+id/gistErrorTitle" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gistErrorGuideline"
@@ -47,6 +47,14 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.5" />
 
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/gistRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/gistRecyclerView"
@@ -56,18 +64,9 @@
         android:scrollbars="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:context="com.elifox.legocatalog.MainActivity"
-        tools:listitem="@layout/gist_item"/>
+        tools:listitem="@layout/gist_item" />
 
-    <ProgressBar
-        android:id="@+id/gistProgressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/gistGroupError"

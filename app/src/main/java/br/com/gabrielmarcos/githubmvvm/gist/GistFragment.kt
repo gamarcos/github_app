@@ -22,8 +22,6 @@ class GistFragment : BaseFragment() {
 
     private lateinit var viewModel: GistViewModel
 
-    private var neededUpdate = false
-
     private val gistAdapter = GistAdapter(
         { gist -> onItemSelected(gist) },
         { gist -> onFavoriteItemSelected(gist) }
@@ -40,6 +38,7 @@ class GistFragment : BaseFragment() {
         setUpObservables()
         setUpAdapter()
         setUpNetworkObserve()
+        setUpRefresh()
         setUpSnackbar(this.view!!, viewModel.showSnackbarMessage)
     }
 
@@ -52,27 +51,15 @@ class GistFragment : BaseFragment() {
     private fun setUpNetworkObserve() {
         InternetUtil.observe(this, Observer { hasNetwork ->
             viewModel.connectionAvailability = hasNetwork
-            checkNetworkConnection(hasNetwork)
         })
     }
 
-    private fun checkNetworkConnection(hasNetwork: Boolean) {
-        takeIf { !hasNetwork }?.run {
-            neededUpdate = true
-        } ?: checkRefreshList()
-    }
-
-    private fun checkRefreshList() {
-        takeIf { neededUpdate }?.run {
-            viewModel.getGistList()
-            neededUpdate = false
-        }
+    private fun setUpRefresh() {
+        gistRefresh.setOnRefreshListener { viewModel.getGistList() }
     }
 
     private fun setUpObservables() {
         viewModel.gistListViewState.observe(viewLifecycleOwner, Observer { gistAdapter.items = it })
-
-        viewModel.showLoading.observe(viewLifecycleOwner, EventObserver { gistProgressBar.show() })
 
         viewModel.resultSuccess.observe(viewLifecycleOwner, EventObserver { showSuccessLayout() })
 
@@ -84,7 +71,7 @@ class GistFragment : BaseFragment() {
     private fun showSuccessLayout() {
         gistRecyclerView.show()
         gistGroupError.hide()
-        gistProgressBar.hide()
+        gistRefresh.isRefreshing = false
     }
 
     private fun setUpEmptyLayout() {
@@ -103,8 +90,8 @@ class GistFragment : BaseFragment() {
 
     private fun showHandleProblemLayout() {
         gistGroupError.show()
-        gistProgressBar.hide()
         gistRecyclerView.hide()
+        gistRefresh.isRefreshing = false
     }
 
     private fun setUpAdapter() {

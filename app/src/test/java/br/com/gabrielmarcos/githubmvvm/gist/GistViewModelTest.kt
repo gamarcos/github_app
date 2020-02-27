@@ -8,7 +8,7 @@ import br.com.gabrielmarcos.githubmvvm.utils.gistExpectedResponse
 import br.com.gabrielmarcos.githubmvvm.utils.starredGistExpectedValue
 import br.com.gabrielmarcos.githubmvvm.utils.unstarredGistExpectedValue
 import io.reactivex.Completable
-import io.reactivex.Flowable
+import io.reactivex.Observable
 import io.reactivex.Single.error
 import io.reactivex.Single.just
 import org.junit.Assert.assertEquals
@@ -52,7 +52,7 @@ class GistViewModelTest {
     @Test
     fun `when remote gist list response success then assert no errors`() {
         `when`(gistRepository.getGistList(FIRST_PAGE, true)).thenReturn(
-            Flowable.just(
+            Observable.just(
                 gistExpectedResponse
             )
         )
@@ -68,7 +68,7 @@ class GistViewModelTest {
     fun `when remote gist list response error then assert that snack error is showed`() {
         val expectedError = RuntimeException("RuntimeException")
         `when`(gistRepository.getGistList(FIRST_PAGE, true))
-            .thenReturn(Flowable.error(expectedError))
+            .thenReturn(Observable.error(expectedError))
 
 
         viewModel.connectionAvailability = true
@@ -83,7 +83,12 @@ class GistViewModelTest {
 
     @Test
     fun `when remote gist list is empty then assert empty layout is showed`() {
-        `when`(gistRepository.getGistList(FIRST_PAGE, true)).thenReturn(Flowable.just(emptyList()))
+        `when`(
+            gistRepository.getGistList(
+                FIRST_PAGE,
+                true
+            )
+        ).thenReturn(Observable.just(emptyList()))
 
         viewModel.connectionAvailability = true
         viewModel.getGistList()
@@ -180,7 +185,7 @@ class GistViewModelTest {
     @Test
     fun `when update gist list then update current position assert that not null`() {
         `when`(gistRepository.getGistList(SECOND_PAGE, true)).thenReturn(
-            Flowable.just(
+            Observable.just(
                 gistExpectedResponse
             )
         )
@@ -199,10 +204,6 @@ class GistViewModelTest {
         verify(gistRepository, times(1)).getGistList(page, true)
         verify(gistRepository, times(1)).getSavedFavoriteGist()
         verify(gistRepository, times(1)).saveLocalGist(emptyList())
-
-        viewModel.showLoading.getOrAwaitValue().run {
-            assertNotNull(getContentIfNotHandled())
-        }
 
         viewModel.gistListViewState.getOrAwaitValue().run {
             assertNotNull(this)

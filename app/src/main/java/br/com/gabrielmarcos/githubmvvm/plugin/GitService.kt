@@ -1,7 +1,7 @@
 package br.com.gabrielmarcos.githubmvvm.plugin
 
 import br.com.gabrielmarcos.githubmvvm.model.Gist
-import io.reactivex.Flowable
+import io.reactivex.Observable
 import io.reactivex.Single
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -10,7 +10,7 @@ import retrofit2.http.Query
 interface GitService {
 
     @GET("/gists/public")
-    fun getGists(@Query("page") page: Int): Flowable<List<Gist>>
+    fun getGists(@Query("page") page: Int): Observable<List<Gist>>
 
     @GET("/gists/{id}")
     fun getGist(@Path("id") id: String): Single<Gist>

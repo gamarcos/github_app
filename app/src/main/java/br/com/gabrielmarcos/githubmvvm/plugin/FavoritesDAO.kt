@@ -6,12 +6,12 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import br.com.gabrielmarcos.githubmvvm.model.FavModel
 import io.reactivex.Completable
-import io.reactivex.Single
+import io.reactivex.Observable
 
 @Dao
 interface FavoritesDAO {
     @Query("SELECT * FROM fav")
-    fun getAllFavGists(): Single<List<FavModel>>
+    fun getAllFavGists(): Observable<List<FavModel>>
 
     @Query("DELETE FROM fav WHERE favId = :id")
     fun deleteFavById(id: String): Completable

@@ -4,7 +4,7 @@ import br.com.gabrielmarcos.githubmvvm.gist.GistRepository
 import br.com.gabrielmarcos.githubmvvm.model.FavModel
 import br.com.gabrielmarcos.githubmvvm.model.Gist
 import io.reactivex.Completable
-import io.reactivex.Flowable
+import io.reactivex.Observable
 import io.reactivex.Single
 import javax.inject.Inject
 
@@ -14,10 +14,11 @@ class GistRepositoryImpl @Inject constructor(
     private val favoritesDAO: FavoritesDAO
 ) : GistRepository {
 
-    override fun getGistList(page: Int, connectionAvailability: Boolean): Flowable<List<Gist>> {
-        return takeIf { connectionAvailability }?.run {
+    override fun getGistList(page: Int, connectionAvailability: Boolean): Observable<List<Gist>> {
+        return if (connectionAvailability) {
             gistService.getGists(page)
-        } ?: gistDAO.getAllGists()
+        } else
+            gistDAO.getAllGists()
     }
 
     override fun saveLocalGist(gist: List<Gist>): Completable = gistDAO.insertAll(gist)
@@ -32,5 +33,5 @@ class GistRepositoryImpl @Inject constructor(
             ?: gistDAO.getGistById(uuid)
     }
 
-    override fun getSavedFavoriteGist(): Single<List<FavModel>> = favoritesDAO.getAllFavGists()
+    override fun getSavedFavoriteGist(): Observable<List<FavModel>> = favoritesDAO.getAllFavGists()
 }

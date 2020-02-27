@@ -49,8 +49,7 @@ class MainActivity : BaseActivity() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = false
             override fun onQueryTextChange(quest: String?): Boolean {
-                // gistViewModel.checkOwnerFilter(quest)
-                setUpSnakMessage(R.string.gist_feature_in_progress, R.color.orange_warning)
+                gistViewModel.checkOwnerFilter(quest)
                 return true
             }
         })
