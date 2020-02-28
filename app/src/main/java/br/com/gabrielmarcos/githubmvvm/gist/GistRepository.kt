@@ -7,7 +7,6 @@ import io.reactivex.Observable
 import io.reactivex.Single
 
 interface GistRepository {
-    //Gists
     fun getGistList(page: Int, connectionAvailability: Boolean): Single<List<Gist>>
     fun getGist(uuid: String, connectionAvailability: Boolean): Single<Gist>
     fun setLocalGist(gist: List<Gist>): Completable

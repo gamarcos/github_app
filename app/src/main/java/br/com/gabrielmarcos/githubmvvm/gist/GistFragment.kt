@@ -16,6 +16,7 @@ import br.com.gabrielmarcos.githubmvvm.model.Gist
 import br.com.gabrielmarcos.githubmvvm.util.InfiniteScrollListener
 import br.com.gabrielmarcos.githubmvvm.util.InternetUtil
 import br.com.gabrielmarcos.githubmvvm.util.NavigationCustom
+import kotlinx.android.synthetic.main.gist_feedback_content.*
 import kotlinx.android.synthetic.main.gist_fragment.*
 
 class GistFragment : BaseFragment() {
@@ -71,7 +72,7 @@ class GistFragment : BaseFragment() {
 
     private fun showSuccessLayout() {
         gistRecyclerView.show()
-        gistGroupError.hide()
+        gistFeedBackContent.hide()
         gistRefresh.isRefreshing = false
     }
 
@@ -90,7 +91,7 @@ class GistFragment : BaseFragment() {
     }
 
     private fun showHandleProblemLayout() {
-        gistGroupError.show()
+        gistFeedBackContent.show()
         gistRecyclerView.hide()
         gistRefresh.isRefreshing = false
     }

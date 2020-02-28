@@ -63,7 +63,10 @@ open class GistViewModel @Inject constructor(
     }
 
     private fun buildGistMapper() {
-        handleListUpdate().also { handleSuccess(it) }
+        handleListUpdate().also {
+            listResult = it
+            handleSuccess(it)
+        }
         resultSuccess.value = Event(Unit)
     }
 
