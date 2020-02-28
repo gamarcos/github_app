@@ -22,8 +22,6 @@ open class RxViewModel : ViewModel() {
             completable
                 .subscribeOn(SchedulersFacade.io())
                 .observeOn(SchedulersFacade.ui())
-                .doOnComplete { Timber.i("Do On Success: RxViewModel") }
-                .doOnError { Timber.i("Do On Error: RxViewModel") }
                 .subscribe(
                     { Timber.i("Subscribe On Success: RxViewModel") },
                     { Timber.i("Subscribe On Error: RxViewModel") })
